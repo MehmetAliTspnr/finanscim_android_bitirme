@@ -1,0 +1,29 @@
+name: finanscim
+description: A new Flutter project
+
+publish_to: 'none' # Remove this line if you want to publish to pub.dev
+
+environment:
+  sdk: ">=2.18.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Diğer bağımlılıklar
+  fl_chart: ^0.70.2 # PieChart için fl_chart kütüphanesi de eklendi
+  intl: ^0.20.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true  # Varsayılan materyal tasarım bileşenlerini kullan
+  assets:
+    - assets/fonts/  # Fontlar klasörü eklendi
+
+  fonts:
+    - family: Rubik  # Kullanacağınız font adı
+      fonts:
+        - asset: assets/fonts/Rubik-LightItalic.ttf  # Font dosyasının yolu

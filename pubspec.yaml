@@ -13,6 +13,8 @@ dependencies:
   # Diğer bağımlılıklar
   fl_chart: ^0.70.2 # PieChart için fl_chart kütüphanesi de eklendi
   intl: ^0.20.1
+  firebase_core: ^3.10.0
+  firebase_auth: ^5.4.0 #firebase auth paketi pub.dev den indirildi
 
 dev_dependencies:
   flutter_test:
@@ -22,8 +24,9 @@ flutter:
   uses-material-design: true  # Varsayılan materyal tasarım bileşenlerini kullan
   assets:
     - assets/fonts/  # Fontlar klasörü eklendi
+    - lib/assets/image/mavi_login.jpg
 
   fonts:
     - family: Rubik  # Kullanacağınız font adı
       fonts:
-        - asset: assets/fonts/Rubik-LightItalic.ttf  # Font dosyasının yolu
+        - asset: assets/fonts/Rubik-LightItalic.ttf # Font dosyasının yolu

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "66630699553",
+    "project_id": "finanstakipyeni",
+    "storage_bucket": "finanstakipyeni.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:66630699553:android:ca0f178500c36c50d53160",
+        "android_client_info": {
+          "package_name": "com.example.finanscim"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmLO1tgVyYgo-n6X2qO48IVpqLbrYOx-M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

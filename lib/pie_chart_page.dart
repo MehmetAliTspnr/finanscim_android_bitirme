@@ -471,6 +471,8 @@ class PieChartPage extends StatelessWidget {
     return colors[index % colors.length];
   }
 }*/
+
+/*
 import 'package:flutter/material.dart';
 import 'transaction.dart';
 import 'package:fl_chart/fl_chart.dart'; // fl_chart paketini import ediyoruz
@@ -586,6 +588,569 @@ class PieChartPage extends StatelessWidget {
   }
 
   // Kategorilere göre renkler
+  Color _getCategoryColor(String category) {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.red,
+      Colors.purple,
+      Colors.yellow
+    ];
+    int index = categories.indexOf(category);
+    return colors[index % colors.length];
+  }
+}
+*/
+/*
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as fs;
+import 'transaction.dart';
+import 'package:fl_chart/fl_chart.dart';
+
+
+class PieChartPage extends StatefulWidget {
+  final String type; // 'Gelir' veya 'Gider'
+
+  PieChartPage({
+    required this.type,
+
+
+  });
+
+  @override
+  _PieChartPageState createState() => _PieChartPageState();
+}
+
+class _PieChartPageState extends State<PieChartPage> {
+  late Future<List<Transaction>> transactionsFuture;
+  List<String> categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    transactionsFuture = fetchTransactions();
+  }
+
+  // Verileri Firestore'dan çekme fonksiyonu
+  Future<List<Transaction>> fetchTransactions() async {
+    List<Transaction> transactions = [];
+    try {
+      var snapshot = await fs.FirebaseFirestore.instance
+          .collection('transactions')
+          .where('type', isEqualTo: widget.type)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        var data = doc.data();
+        transactions.add(Transaction(
+          amount: (data['amount'] as num?)?.toDouble() ?? 0.0,
+          date: (data['date'] as fs.Timestamp).toDate(),
+          type: data['type'] ?? '',
+          category: data['type_two'] ?? 'Uncategorized',
+          sonuc: (data['sonuc'] as num?)?.toDouble() ?? 0.0,
+          type_two: data['type_two'] ?? '',
+        ));
+        if (!categories.contains(data['type_two'])) {
+          categories.add(data['type_two'] ?? 'Uncategorized');
+        }
+      }
+    } catch (e) {
+      print("Veri alınırken hata oluştu: $e");
+    }
+    return transactions;
+  }
+
+  // Kategori bazında toplam değerleri hesaplama
+  Map<String, double> calculateCategoryTotals(List<Transaction> transactions) {
+    Map<String, double> categoryTotals = {};
+
+    for (var transaction in transactions) {
+      categoryTotals[transaction.category] =
+          (categoryTotals[transaction.category] ?? 0) + transaction.amount;
+    }
+
+    return categoryTotals;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${widget.type} Grafiği'),
+      ),
+      body: FutureBuilder<List<Transaction>>(
+        future: transactionsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Hata: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('Hiç ${widget.type} verisi yok.'));
+          } else {
+            List<Transaction> transactions = snapshot.data!;
+            final categoryTotals = calculateCategoryTotals(transactions);
+            final total =
+            categoryTotals.values.fold(0.0, (sum, value) => sum + value);
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text(
+                    '${widget.type} Toplamı: $total',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: categoryTotals.isEmpty
+                        ? Center(child: Text('Hiç ${widget.type} verisi yok.'))
+                        : PieChart(
+                      PieChartData(
+                        sections: categoryTotals.entries.map((entry) {
+                          final percentage =
+                              (entry.value / total) * 100;
+                          return PieChartSectionData(
+                            color: _getCategoryColor(entry.key),
+                            value: percentage,
+                            title: '${percentage.toStringAsFixed(1)}%',
+                            radius: 100,
+                            titleStyle: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          );
+                        }).toList(),
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 50,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // Kategorilerin listesi
+                  categoryTotals.isNotEmpty
+                      ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Kategoriler:',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 10),
+                      ...categoryTotals.entries.map((entry) {
+                        return Padding(
+                          padding:
+                          const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _getCategoryColor(entry.key),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '${entry.key}: ${entry.value.toStringAsFixed(2)}',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  )
+                      : SizedBox(),
+                ],
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  // Kategorilere göre renkler
+  Color _getCategoryColor(String category) {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.red,
+      Colors.purple,
+      Colors.yellow
+    ];
+    int index = categories.indexOf(category);
+    return colors[index % colors.length];
+  }
+}
+*/
+// pie_chart_page.dart
+
+/*
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as fs;
+import 'transaction.dart';
+import 'package:fl_chart/fl_chart.dart';
+
+class PieChartPage extends StatefulWidget {
+  final String type;// 'Gelir' or 'Gider'
+  final List<Transaction> transactions;//İşlem listesi
+  final List<String> categories;//Kategori listesi
+
+
+  PieChartPage({
+    required this.type,
+    required this.transactions,
+    required this.categories,
+  });
+
+  @override
+  _PieChartPageState createState() => _PieChartPageState();
+}
+
+class _PieChartPageState extends State<PieChartPage> {
+  late Future<List<Transaction>> transactionsFuture;
+  List<String> categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    transactionsFuture = fetchTransactions();
+  }
+
+  Future<List<Transaction>> fetchTransactions() async {
+    List<Transaction> transactions = [];
+    try {
+      var snapshot = await fs.FirebaseFirestore.instance
+          .collection('transactions')
+          .where('type', isEqualTo: widget.type)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        var data = doc.data();
+        transactions.add(Transaction(
+          amount: (data['amount'] as num?)?.toDouble() ?? 0.0,
+          date: (data['date'] as fs.Timestamp).toDate(),
+          type: data['type'] ?? '',
+          category: data['type_two'] ?? 'Uncategorized',
+          sonuc: (data['sonuc'] as num?)?.toDouble() ?? 0.0,
+          type_two: data['type_two'] ?? '',
+        ));
+        if (!categories.contains(data['type_two'])) {
+          categories.add(data['type_two'] ?? 'Uncategorized');
+        }
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
+    }
+    return transactions;
+  }
+
+  Map<String, double> calculateCategoryTotals(List<Transaction> transactions) {
+    Map<String, double> categoryTotals = {};
+
+    for (var transaction in transactions) {
+      categoryTotals[transaction.category] =
+          (categoryTotals[transaction.category] ?? 0) + transaction.amount;
+    }
+
+    return categoryTotals;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${widget.type} Chart'),
+      ),
+      body: FutureBuilder<List<Transaction>>(
+        future: transactionsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No ${widget.type} data available.'));
+          } else {
+            List<Transaction> transactions = snapshot.data!;
+            final categoryTotals = calculateCategoryTotals(transactions);
+            final total =
+            categoryTotals.values.fold(0.0, (sum, value) => sum + value);
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text(
+                    '${widget.type} Total: $total',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: categoryTotals.isEmpty
+                        ? Center(child: Text('No ${widget.type} data available.'))
+                        : PieChart(
+                      PieChartData(
+                        sections: categoryTotals.entries.map((entry) {
+                          final percentage =
+                              (entry.value / total) * 100;
+                          return PieChartSectionData(
+                            color: _getCategoryColor(entry.key),
+                            value: percentage,
+                            title: '${percentage.toStringAsFixed(1)}%',
+                            radius: 100,
+                            titleStyle: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          );
+                        }).toList(),
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 50,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  categoryTotals.isNotEmpty
+                      ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Categories:',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 10),
+                      ...categoryTotals.entries.map((entry) {
+                        return Padding(
+                          padding:
+                          const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _getCategoryColor(entry.key),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '${entry.key}: ${entry.value.toStringAsFixed(2)}',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  )
+                      : SizedBox(),
+                ],
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Color _getCategoryColor(String category) {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.red,
+      Colors.purple,
+      Colors.yellow
+    ];
+    int index = categories.indexOf(category);
+    return colors[index % colors.length];
+  }
+}
+
+*/
+
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as fs;
+import 'transaction.dart';
+import 'package:fl_chart/fl_chart.dart';
+
+class PieChartPage extends StatefulWidget {
+  final String type; // 'Gelir' or 'Gider'
+  final List<Transaction> transactions; // İşlem listesi
+  final List<String> categories; // Kategori listesi
+
+  PieChartPage({
+    required this.type,
+    required this.transactions,
+    required this.categories,
+  });
+
+  @override
+  _PieChartPageState createState() => _PieChartPageState();
+}
+
+class _PieChartPageState extends State<PieChartPage> {
+  late Future<List<Transaction>> transactionsFuture;
+  List<String> categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    transactionsFuture = fetchTransactions();
+  }
+
+  Future<List<Transaction>> fetchTransactions() async {
+    List<Transaction> transactions = [];
+    try {
+      var snapshot = await fs.FirebaseFirestore.instance
+          .collection('transactions')
+          .where('type', isEqualTo: widget.type)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        var data = doc.data();
+        transactions.add(Transaction(
+          amount: (data['amount'] as num?)?.toDouble() ?? 0.0,
+          date: (data['date'] as fs.Timestamp).toDate(),
+          type: data['type'] ?? '',
+          category: data['type_two'] ?? 'Uncategorized', // type_two kategorisi
+          sonuc: (data['sonuc'] as num?)?.toDouble() ?? 0.0,
+          type_two: data['type_two'] ?? '', // type_two kategorisi
+        ));
+
+        // 'type_two' değerini kategoriler listesine ekle
+        if (!categories.contains(data['type_two'])) {
+          categories.add(data['type_two'] ?? 'Uncategorized');
+        }
+      }
+    } catch (e) {
+      print("Error fetching transactions: $e");
+    }
+    return transactions;
+  }
+
+  Map<String, double> calculateCategoryTotals(List<Transaction> transactions) {
+    Map<String, double> categoryTotals = {};
+
+    for (var transaction in transactions) {
+      categoryTotals[transaction.category] =
+          (categoryTotals[transaction.category] ?? 0) + transaction.amount;
+    }
+
+    return categoryTotals;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${widget.type} Chart'),
+      ),
+      body: FutureBuilder<List<Transaction>>(
+        future: transactionsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No ${widget.type} data available.'));
+          } else {
+            List<Transaction> transactions = snapshot.data!;
+            final categoryTotals = calculateCategoryTotals(transactions);
+            final total =
+            categoryTotals.values.fold(0.0, (sum, value) => sum + value);
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text(
+                    '${widget.type} Total: $total',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: categoryTotals.isEmpty
+                        ? Center(child: Text('No ${widget.type} data available.'))
+                        : PieChart(
+                      PieChartData(
+                        sections: categoryTotals.entries.map((entry) {
+                          final percentage =
+                              (entry.value / total) * 100;
+                          return PieChartSectionData(
+                            color: _getCategoryColor(entry.key),
+                            value: percentage,
+                            title: '${percentage.toStringAsFixed(1)}%',
+                            radius: 100,
+                            titleStyle: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          );
+                        }).toList(),
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 50,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  categoryTotals.isNotEmpty
+                      ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Categories:',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 10),
+                      ...categoryTotals.entries.map((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _getCategoryColor(entry.key),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '${entry.key}: ${entry.value.toStringAsFixed(2)}',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  )
+                      : SizedBox(),
+                ],
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
   Color _getCategoryColor(String category) {
     final colors = [
       Colors.blue,

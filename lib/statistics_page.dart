@@ -839,6 +839,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
 }
 */
 
+/*
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fs;
 import 'transaction.dart';
@@ -859,9 +861,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   void initState() {
     super.initState();
+    // Verileri çekmek için fetchTransactions fonksiyonunu çağırıyoruz
     transactionsFuture = fetchTransactions();
   }
 
+  // Verileri Firestore'dan çekme fonksiyonu
   Future<List<Transaction>> fetchTransactions() async {
     List<Transaction> transactions = [];
     try {
@@ -886,17 +890,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return transactions;
   }
 
-  Future<void> updateTransactions(List<Transaction> transactions) async {
+  // Veriyi sadece ekleme işlemi (eski verileri silmeden)
+  Future<void> addTransactions(List<Transaction> transactions) async {
     try {
-      // Clear previous transactions in Firestore
-      var snapshot = await fs.FirebaseFirestore.instance
-          .collection('transactions')
-          .get();
-      for (var doc in snapshot.docs) {
-        await doc.reference.delete();
-      }
-
-      // Add new transaction(s)
       for (var transaction in transactions) {
         await fs.FirebaseFirestore.instance.collection('transactions').add({
           'amount': transaction.amount,
@@ -908,16 +904,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Veriler başarıyla güncellendi!')),
+        SnackBar(content: Text('Veriler başarıyla eklendi!')),
       );
     } catch (e) {
-      print("Veri güncellenirken hata oluştu: $e");
+      print("Veri eklenirken hata oluştu: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Veri güncellenirken hata oluştu.')),
+        SnackBar(content: Text('Veri eklenirken hata oluştu.')),
       );
     }
   }
-
 
   List<Transaction> filterTransactionsByDate(
       List<Transaction> transactions, DateTime start, DateTime end) {
@@ -1048,7 +1043,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   SizedBox(height: 20),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () => updateTransactions(widget.transactions),
+                      onPressed: () => addTransactions(widget.transactions),
                       child: Text('Veri Güncelle'),
                     ),
                   ),
@@ -1060,13 +1055,16 @@ class _StatisticsPageState extends State<StatisticsPage> {
       ),
     );
   }
-}
- /*
+}*/
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fs;
 import 'transaction.dart';
 
 class StatisticsPage extends StatefulWidget {
+  final List<Transaction> transactions;
+
+  StatisticsPage({required this.transactions});
+
   @override
   _StatisticsPageState createState() => _StatisticsPageState();
 }
@@ -1081,26 +1079,64 @@ class _StatisticsPageState extends State<StatisticsPage> {
     transactionsFuture = fetchTransactions();
   }
 
+  // Verileri Firestore'dan çekme fonksiyonu
   Future<List<Transaction>> fetchTransactions() async {
+    List<Transaction> transactions = [];
     try {
-      final snapshot = await fs.FirebaseFirestore.instance
+      var snapshot = await fs.FirebaseFirestore.instance
           .collection('transactions')
           .get();
 
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        return Transaction(
+      for (var doc in snapshot.docs) {
+        var data = doc.data();
+        transactions.add(Transaction(
           amount: (data['amount'] as num?)?.toDouble() ?? 0.0,
           date: (data['date'] as fs.Timestamp).toDate(),
           type: data['type'] ?? '',
           category: data['type_two'] ?? 'Uncategorized',
           sonuc: (data['sonuc'] as num?)?.toDouble() ?? 0.0,
           type_two: data['type_two'] ?? '',
-        );
-      }).toList();
+        ));
+      }
     } catch (e) {
       print("Veri alınırken hata oluştu: $e");
-      return [];
+    }
+    return transactions;
+  }
+
+  // Veriyi sadece ekleme işlemi (eski verileri silmeden)
+  Future<void> addTransactions(List<Transaction> transactions) async {
+    try {
+      for (var transaction in transactions) {
+        // Veriyi eklemeden önce Firestore'dan veriyi kontrol et
+        var snapshot = await fs.FirebaseFirestore.instance
+            .collection('transactions')
+            .where('amount', isEqualTo: transaction.amount)
+            .where('date', isEqualTo: transaction.date)
+            .get();
+
+        if (snapshot.docs.isEmpty) {
+          // Eğer mevcutta yoksa, yeni veriyi ekle
+          await fs.FirebaseFirestore.instance.collection('transactions').add({
+            'amount': transaction.amount,
+            'date': transaction.date,
+            'type': transaction.type,
+            'type_two': transaction.type_two,
+            'sonuc': transaction.sonuc,
+          });
+        } else {
+          print("Bu veri zaten mevcut, eklenmedi.");
+        }
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Veriler başarıyla eklendi!')),
+      );
+    } catch (e) {
+      print("Veri eklenirken hata oluştu: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Veri eklenirken hata oluştu.')),
+      );
     }
   }
 
@@ -1111,27 +1147,41 @@ class _StatisticsPageState extends State<StatisticsPage> {
     }).toList();
   }
 
-  List<Transaction> getFilteredTransactions(List<Transaction> transactions) {
-    DateTime now = DateTime.now();
-    if (selectedPeriod == 'Daily') {
-      final startOfDay = DateTime(now.year, now.month, now.day);
-      final endOfDay = startOfDay.add(Duration(days: 1));
-      return filterTransactionsByDate(transactions, startOfDay, endOfDay);
-    } else if (selectedPeriod == 'Weekly') {
-      final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-      final endOfWeek = startOfWeek.add(Duration(days: 7));
-      return filterTransactionsByDate(transactions, startOfWeek, endOfWeek);
-    } else {
-      final startOfMonth = DateTime(now.year, now.month, 1);
-      final endOfMonth = DateTime(now.year, now.month + 1, 1);
-      return filterTransactionsByDate(transactions, startOfMonth, endOfMonth);
-    }
+  List<Transaction> getDailyTransactions(List<Transaction> transactions) {
+    DateTime today = DateTime.now();
+    DateTime startOfDay = DateTime(today.year, today.month, today.day);
+    DateTime endOfDay = startOfDay.add(Duration(days: 1));
+    return filterTransactionsByDate(transactions, startOfDay, endOfDay);
   }
 
-  double calculateTotal(List<Transaction> transactions, String type) {
+  List<Transaction> getWeeklyTransactions(List<Transaction> transactions) {
+    DateTime now = DateTime.now();
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    DateTime endOfWeek = startOfWeek.add(Duration(days: 7));
+    return filterTransactionsByDate(transactions, startOfWeek, endOfWeek);
+  }
+
+  List<Transaction> getMonthlyTransactions(List<Transaction> transactions) {
+    DateTime now = DateTime.now();
+    DateTime startOfMonth = DateTime(now.year, now.month, 1);
+    DateTime endOfMonth = DateTime(now.year, now.month + 1, 1);
+    return filterTransactionsByDate(transactions, startOfMonth, endOfMonth);
+  }
+
+  double calculateIncome(List<Transaction> transactions) {
     return transactions
-        .where((transaction) => transaction.type == type)
+        .where((transaction) => transaction.type == 'Gelir')
         .fold(0.0, (sum, transaction) => sum + transaction.amount);
+  }
+
+  double calculateExpense(List<Transaction> transactions) {
+    return transactions
+        .where((transaction) => transaction.type == 'Gider')
+        .fold(0.0, (sum, transaction) => sum + transaction.amount);
+  }
+
+  double calculateNet(List<Transaction> transactions) {
+    return calculateIncome(transactions) - calculateExpense(transactions);
   }
 
   @override
@@ -1150,12 +1200,24 @@ class _StatisticsPageState extends State<StatisticsPage> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('Veri bulunamadı.'));
           } else {
-            final allTransactions = snapshot.data!;
-            final filteredTransactions = getFilteredTransactions(allTransactions);
+            List<Transaction> transactions = snapshot.data!;
 
-            final income = calculateTotal(filteredTransactions, 'Gelir');
-            final expense = calculateTotal(filteredTransactions, 'Gider');
-            final net = income - expense;
+            List<Transaction> transactionsToDisplay;
+            String periodLabel;
+            switch (selectedPeriod) {
+              case 'Weekly':
+                transactionsToDisplay = getWeeklyTransactions(transactions);
+                periodLabel = 'Haftalık Veriler';
+                break;
+              case 'Monthly':
+                transactionsToDisplay = getMonthlyTransactions(transactions);
+                periodLabel = 'Aylık Veriler';
+                break;
+              default:
+                transactionsToDisplay = getDailyTransactions(transactions);
+                periodLabel = 'Günlük Veriler';
+                break;
+            }
 
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -1163,15 +1225,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    '$selectedPeriod Verileri',
+                    periodLabel,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
-                  Text('Gelir: ${income.toStringAsFixed(2)}'),
-                  Text('Gider: ${expense.toStringAsFixed(2)}'),
+                  Text('Gelir: ${calculateIncome(transactionsToDisplay)}'),
+                  Text('Gider: ${calculateExpense(transactionsToDisplay)}'),
                   SizedBox(height: 10),
                   Text(
-                    'Net Durum: ${net.toStringAsFixed(2)}',
+                    'Net Durum: ${calculateNet(transactionsToDisplay)}',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 20),
@@ -1204,6 +1266,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 20),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () => addTransactions(widget.transactions),
+                      child: Text('Veri Güncelle'),
+                    ),
+                  ),
                 ],
               ),
             );
@@ -1213,5 +1282,3 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 }
-
-*/

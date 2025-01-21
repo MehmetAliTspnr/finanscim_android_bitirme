@@ -72,7 +72,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Veriler başarıyla eklendi!')),
+        SnackBar(content: Text('Veriler başarıyla güncellendi!')),
       );
     } catch (e) {
       print("Veri eklenirken hata oluştu: $e");
@@ -209,12 +209,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () => addTransactions(widget.transactions),
-                      child: Text('Veri Güncelle'),
-                    ),
-                  ),
+                 // Center(
+                    //child: ElevatedButton(
+                      //onPressed: () => addTransactions(widget.transactions), istatistik sayfasında veri güncelle butonu kaldırıldı
+                      //child: Text('Veri Güncelle'),onun görevi ekle butonuna verildi.
+                   // ),
+                 // ),
                 ],
               ),
             );
@@ -224,3 +224,5 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 }
+
+

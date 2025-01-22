@@ -4,7 +4,7 @@ import 'transaction.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class PieChartPage extends StatefulWidget {
-  final String type; // 'Gelir' or 'Gider'
+  final String type; // Gelir veya Gider durumu
   final List<Transaction> transactions; // İşlem listesi
   final List<String> categories; // Kategori listesi
 
@@ -43,7 +43,7 @@ class _PieChartPageState extends State<PieChartPage> {
           type: data['type'] ?? '',
           category: data['category'] ?? 'No category',
           sonuc: (data['sonuc'] as num?)?.toDouble() ?? 0.0,
-          type_two: data['type_two'] ?? '', // 'type_two' burada doğru kullanılıyor
+          type_two: data['type_two'] ?? '', //Girilen kategori type_two
         ));
       }
     } catch (e) {

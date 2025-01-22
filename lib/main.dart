@@ -5,10 +5,11 @@ import 'firebase_options.dart';
 import 'package:finanscim/pages/login_register_page.dart'; // LoginRegisterPage ekranı
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();//Firebase başlatılmadan önce gerekli tüm Flutter
+  // bileşenlerinin başlatılmasını sağlar.
 
-  // Firebase'i başlatıyoruz
-  await Firebase.initializeApp(
+  // Firebase'i başlatma
+  await Firebase.initializeApp(  //await: asenkron
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Finanscım',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,//debug yazısını kaldırıldı.
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Firestore'a veri eklemek için örnek bir fonksiyon
+// Firestore'a veri ekleme örnegi*
 Future<void> addTransactionToFirestore(double amount, String type, DateTime date) async {
   try {
     await FirebaseFirestore.instance.collection('transactions').add({

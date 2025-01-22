@@ -189,10 +189,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Use backgroundColor instead of primary
-                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12), // Increase button size horizontally
+                          backgroundColor: Colors.blue,
+                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                         ),
-                        child: Text('Günlük', style: TextStyle(fontSize: 16)), // Optional: Customize text size
+                        child: Text('Günlük', style: TextStyle(fontSize: 16)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -201,10 +201,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Use backgroundColor instead of primary
-                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12), // Increase button size horizontally
+                          backgroundColor: Colors.blue,
+                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                         ),
-                        child: Text('Haftalık', style: TextStyle(fontSize: 16)), // Optional: Customize text size
+                        child: Text('Haftalık', style: TextStyle(fontSize: 16)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -213,10 +213,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Use backgroundColor instead of primary
-                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12), // Increase button size horizontally
+                          backgroundColor: Colors.blue,
+                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12), //yatay ve dikey
                         ),
-                        child: Text('Aylık', style: TextStyle(fontSize: 16)), // Optional: Customize text size
+                        child: Text('Aylık', style: TextStyle(fontSize: 16)),
                       ),
                     ],
                   ),

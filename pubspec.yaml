@@ -16,7 +16,7 @@ dependencies:
   firebase_core: ^3.10.0
   firebase_auth: ^5.4.0 #firebase auth paketi pub.dev den indirildi
   cloud_firestore: ^5.6.1
-  flutter_local_notifications: ^18.0.1
+  flutter_local_notifications: ^18.0.1 #kullanılmadı
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +27,7 @@ flutter:
   assets:
     - assets/fonts/  # Fontlar klasörü eklendi
     - lib/assets/image/mavi_login.jpg
+
 
   fonts:
     - family: Rubik  # Kullanacağınız font adı

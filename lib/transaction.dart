@@ -4,7 +4,7 @@ class Transaction {
   double amount; // İşlem miktarı
   String category; // Kategori bilgisi
   double sonuc; // Sonuç bilgisi
-  String type_two; // Kullanıcının seçtiği kategori (category'nin kopyası)
+  String type_two; // Kullanıcının seçtiği kategori
 
   Transaction({
     required this.date,
@@ -18,7 +18,7 @@ class Transaction {
   // JSON'dan veri oluşturma
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
-      date: DateTime.parse(json['date']), // Firestore'dan gelen Timestamp, DateTime'a dönüştürülüyor
+      date: DateTime.parse(json['date']), // Firestore'dan gelen Timestamp, DateTime'a dönüştür
       type: json['type'] ?? 'Uncategorized', // 'type' alanı gelmezse varsayılan değer atanır
       amount: (json['amount'] as num).toDouble(), // Miktar, num'dan double'a dönüştürülüyor
       category: json['category'] ?? 'No category', // 'category' alanı gelmezse varsayılan değer atanır

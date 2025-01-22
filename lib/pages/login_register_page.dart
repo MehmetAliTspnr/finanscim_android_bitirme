@@ -73,7 +73,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,//axis yatayda hareket ettirir.
               children: [
                 TextField(
                   controller: emailController,
@@ -86,7 +86,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                     filled: true, // Arka planın dolmasını sağlar
                     fillColor: Colors.lightBlue.withValues(alpha:205 ), // Opaklık arttırıldı
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(20.0),//kutuların köşelerini yumuşatmak için
                       borderSide: BorderSide(color: Colors.black, width: 2), // Koyu kenar rengi
                     ),
                   ),
@@ -137,14 +137,14 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                   ),
                   child: isLogin ? const Text("Login") : const Text("Register"),
                 ),
-                GestureDetector(
-                  onTap: () {
+                GestureDetector(//Kullanıcının ekranla olan fiziksel etkileşimlerini algılar.
+                onTap: () {
                     setState(() {
                       isLogin = !isLogin;
                     });
                   },
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 20), // Adjust the value to move the text down
+                    padding: const EdgeInsets.only(top: 20),
                     child: const Text(
                       "Hesabınız Yok mu? Kayıt Ol!",
                       style: TextStyle(

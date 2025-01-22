@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fs;
 import 'pie_chart_page.dart';
 import 'statistics_page.dart';
-import 'transaction.dart'; // Transaction modelini import ediyoruz
+import 'transaction.dart';
 
+//mainAxisAlignment responsive tasarım sonradan eklendi
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
 
   List<String> categories = ['Ev', 'Araba', 'Fatura'];
 
-  // İşlem verilerini tarih bazında saklayacağız
+  // İşlem verilerini tarih bazında saklama.
   List<Transaction> transactions = []; // Transaction modeline göre veri
 
   // Yeni kategori ekleme fonksiyonu
@@ -82,7 +83,7 @@ class _HomePageState extends State<HomePage> {
           date: date, // DateTime tipi ile saklanıyor
         ));
       });
-      addTransactions([transactions.last]); // Yalnızca son işlemi ekliyoruz
+      addTransactions([transactions.last]); // Yalnızca son işlemi ekleme
     }
   }
 
@@ -112,9 +113,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showCategoriesPage() {
-    print("Kategoriler butonuna tıklanmış!");
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -280,16 +278,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               SizedBox(height: screenHeight * 0.02),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _showCategoriesPage,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.3, vertical: screenHeight * 0.015),
-                  ),
-                  child: Text('Kategoriler', style: TextStyle(fontSize: 16)),
-                ),
-              ),
             ],
           ),
         ),

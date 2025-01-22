@@ -71,7 +71,7 @@ class _PieChartPageState extends State<PieChartPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.type} Chart'),
+        title: Text('${widget.type} Grafiği'),
       ),
       body: FutureBuilder<List<Transaction>>(
         future: transactionsFuture,

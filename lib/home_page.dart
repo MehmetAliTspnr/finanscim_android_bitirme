@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Finanscım', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+        title: Text('FİNANSCIM', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24,color: Colors.white)),
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(

@@ -188,7 +188,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             selectedPeriod = 'Daily';
                           });
                         },
-                        child: Text('Günlük'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue, // Use backgroundColor instead of primary
+                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12), // Increase button size horizontally
+                        ),
+                        child: Text('Günlük', style: TextStyle(fontSize: 16)), // Optional: Customize text size
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -196,7 +200,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             selectedPeriod = 'Weekly';
                           });
                         },
-                        child: Text('Haftalık'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue, // Use backgroundColor instead of primary
+                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12), // Increase button size horizontally
+                        ),
+                        child: Text('Haftalık', style: TextStyle(fontSize: 16)), // Optional: Customize text size
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -204,7 +212,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             selectedPeriod = 'Monthly';
                           });
                         },
-                        child: Text('Aylık'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue, // Use backgroundColor instead of primary
+                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12), // Increase button size horizontally
+                        ),
+                        child: Text('Aylık', style: TextStyle(fontSize: 16)), // Optional: Customize text size
                       ),
                     ],
                   ),

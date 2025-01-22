@@ -126,7 +126,7 @@ class _PieChartPageState extends State<PieChartPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Categories:',
+                        'Kategoriler:',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),

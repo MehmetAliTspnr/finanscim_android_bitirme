@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:finanscim/service/auth.dart';
-import 'package:finanscim/home_page.dart'; // Ana sayfa import edilmiştir
+import 'package:finanscim/home_page.dart';
 
 class LoginRegisterPage extends StatefulWidget {
   const LoginRegisterPage({super.key});
@@ -23,9 +23,9 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
         email: emailController.text,
         password: passwordController.text,
       );
-      // Kayıt işleminden sonra, giriş sayfasına yönlendir
+      // Kayıt işleminden sonra, giriş sayfasına yönlendirme
       setState(() {
-        isLogin = true; // Kayıt olduktan sonra login sayfasına geçilsin
+        isLogin = true; // Kayıt olduktan sonra login sayfasına aktarılsın
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Kayıt başarılı! Şimdi giriş yapabilirsiniz.")),
@@ -44,7 +44,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
         email: emailController.text,
         password: passwordController.text,
       );
-      // Giriş başarılı olduğunda, ana sayfaya yönlendir
+      // Giriş başarılı olduğunda, ana sayfaya yönlendirme
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -68,7 +68,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
               fit: BoxFit.cover,  // Resmin tüm ekranı kaplamasını sağlar
             ),
           ),
-          // Form alanları ve butonlar
+          // Uygulamanın form alanları ve butonlar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Column(
@@ -91,10 +91,10 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10), // İki kutucuk arasında boşluk
+                const SizedBox(height: 10), // İki kutucuk arasında boşluk bırakma
                 TextField(
                   controller: passwordController,
-                  obscureText: true, // Şifrenin görünmemesi için ekledik
+                  obscureText: true, // Şifrenin görünmemesi için ekleme ekstra güvenlik+
                   decoration: InputDecoration(
                     hintText: "Password",
                     hintStyle: TextStyle(
@@ -118,7 +118,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                       fontSize: 14, // Set the font size to 18 (or any value you prefer)
                     ),
                   ),
-                const SizedBox(height: 20), // İki kutucuk arasında boşluk
+                const SizedBox(height: 20), // İki kutucuk arasında boşluk bırakıldı
                 ElevatedButton(
                   onPressed: () {
                     if (isLogin) {
